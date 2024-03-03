@@ -1,18 +1,30 @@
-FROM ubuntu:latest As build
+# Primeira etapa: compilação do aplicativo
+FROM ubuntu:latest AS build
 
 RUN apt-get update
 RUN apt-get install openjdk-21-jdk -y
+
+# Define o diretório de trabalho no contêiner
+WORKDIR /app
+
+# Copia os arquivos necessários (toda a estrutura de seu aplicativo)
 COPY . .
 
+# Instala o Maven e compila o aplicativo
 RUN apt-get install maven -y
 RUN mvn clean install
 
+# Segunda etapa: execução do aplicativo compilado
 FROM openjdk:21-jdk-slim
 
+# Define o diretório de trabalho no contêiner
+WORKDIR /app
+
+# Expõe a porta 8080 (certifique-se de que ela é a mesma porta que seu aplicativo está configurado para usar)
 EXPOSE 8080
 
-COPY --from=build target\house-of-books-0.0.1-SNAPSHOT.jar app.jar
+# Copia o JAR compilado da etapa de compilação
+COPY --from=build /app/target/house-of-books-0.0.1-SNAPSHOT.jar app.jar
 
-ENTRYPOINT [ "java", "-jar", "app.jar" ]
-
-
+# Comando de entrada para iniciar o aplicativo
+ENTRYPOINT ["java", "-jar", "app.jar"]
