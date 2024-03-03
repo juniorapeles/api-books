@@ -8,7 +8,7 @@ RUN apt-get install openjdk-21-jdk -y
 WORKDIR /app
 
 # Copia os arquivos necessários (toda a estrutura de seu aplicativo)
-COPY . .
+COPY . /
 
 # Instala o Maven e compila o aplicativo
 RUN apt-get install maven -y
